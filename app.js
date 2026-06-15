@@ -2,12 +2,30 @@
    OYLUM PASTANESİ — App Logic
    ============================================= */
 
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTba6Ya0MZ8uasBuyubcoQaFW_xOemNBldWyaryHU6lgreH8beYFfBgqzMotHhG2YZ6Eb-1KgVbCaKs/pub?output=csv";
-const PROXY   = "https://corsproxy.io/?url=";
+// CSV'den dinamik çekmek için proxy listesi — biri çalışmazsa diğeri denenir
+const CSV_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTba6Ya0MZ8uasBuyubcoQaFW_xOemNBldWyaryHU6lgreH8beYFfBgqzMotHhG2YZ6Eb-1KgVbCaKs/pub?output=csv";
+const PROXIES = [
+  "https://corsproxy.io/?url=",
+  "https://api.allorigins.win/raw?url=",
+  "https://proxy.cors.sh/",
+];
 
-// ── Statik Menü Verisi (fallback) ──────────
-const MENU_DATA = [
-  // Sütlü & Çikolatalı Tatlılar
+// ── Kategori Görselleri ─────────────────────
+const CATEGORY_IMAGES = {
+  "Sütlü & Çikolatalı Tatlılar": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=70",
+  "Şerbetli Tatlılar":           "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?w=400&q=70",
+  "Yan Aperatifler":             "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=70",
+  "Soğuk & Sıcak İçecekler":    "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=70",
+  "Sıcak Kahveler":              "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70",
+  "Soğuk Kahveler":              "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70",
+  "Kiloluk Tatlılar":            "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=70",
+  "Bütün Yaş Pastalar":          "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&q=70",
+};
+const FALLBACK_IMG = "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=70";
+const PRODUCT_IMG  = "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=200&q=60";
+
+// ── Statik Veri (CSV çekilemezse kullanılır) ─
+const STATIC_DATA = [
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Orman Meyveli Trileçe", price: "991 ₺" },
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Karamelli Trileçe", price: "991 ₺" },
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Supangle", price: "991 ₺" },
@@ -24,7 +42,6 @@ const MENU_DATA = [
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Çikolatalı Yaş Pasta", price: "991 ₺" },
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Meyveli Yaş Pasta", price: "991 ₺" },
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Mini Ekler", price: "991 ₺" },
-  // Şerbetli Tatlılar
   { category: "Şerbetli Tatlılar", name: "Fıstıklı Baklava (Tereyağlı)", price: "991 ₺" },
   { category: "Şerbetli Tatlılar", name: "Soğuk Baklava", price: "991 ₺" },
   { category: "Şerbetli Tatlılar", name: "Bülbül Yuvası (Tereyağlı)", price: "991 ₺" },
@@ -34,12 +51,10 @@ const MENU_DATA = [
   { category: "Şerbetli Tatlılar", name: "Cevizli Burma Kadayıf", price: "991 ₺" },
   { category: "Şerbetli Tatlılar", name: "Şekerpare", price: "991 ₺" },
   { category: "Şerbetli Tatlılar", name: "Tulumba", price: "991 ₺" },
-  // Yan Aperatifler
   { category: "Yan Aperatifler", name: "Kuru Pasta", price: "991 ₺" },
   { category: "Yan Aperatifler", name: "Elmalı Kurabiye", price: "991 ₺" },
   { category: "Yan Aperatifler", name: "İzmir Bombası", price: "991 ₺" },
   { category: "Yan Aperatifler", name: "Su Böreği", price: "991 ₺" },
-  // Soğuk & Sıcak İçecekler
   { category: "Soğuk & Sıcak İçecekler", name: "Limonata (El Yapımı)", price: "991 ₺" },
   { category: "Soğuk & Sıcak İçecekler", name: "Basil (Fesleğen Tohumlu İçecek)", price: "991 ₺" },
   { category: "Soğuk & Sıcak İçecekler", name: "Mojito", price: "991 ₺" },
@@ -52,7 +67,6 @@ const MENU_DATA = [
   { category: "Soğuk & Sıcak İçecekler", name: "Meyveli Soda", price: "991 ₺" },
   { category: "Soğuk & Sıcak İçecekler", name: "Su", price: "991 ₺" },
   { category: "Soğuk & Sıcak İçecekler", name: "Çay", price: "991 ₺" },
-  // Sıcak Kahveler
   { category: "Sıcak Kahveler", name: "Türk Kahvesi", price: "991 ₺" },
   { category: "Sıcak Kahveler", name: "Nescafe", price: "991 ₺" },
   { category: "Sıcak Kahveler", name: "Latte Macchiato", price: "991 ₺" },
@@ -63,7 +77,6 @@ const MENU_DATA = [
   { category: "Sıcak Kahveler", name: "Flat White", price: "991 ₺" },
   { category: "Sıcak Kahveler", name: "Caffe Crema", price: "991 ₺" },
   { category: "Sıcak Kahveler", name: "Espresso", price: "991 ₺" },
-  // Soğuk Kahveler
   { category: "Soğuk Kahveler", name: "Latte", price: "991 ₺" },
   { category: "Soğuk Kahveler", name: "Cafe Au Lait", price: "991 ₺" },
   { category: "Soğuk Kahveler", name: "Cappuccino", price: "991 ₺" },
@@ -71,7 +84,6 @@ const MENU_DATA = [
   { category: "Soğuk Kahveler", name: "Caffe Crema", price: "991 ₺" },
   { category: "Soğuk Kahveler", name: "Espresso", price: "991 ₺" },
   { category: "Soğuk Kahveler", name: "Affogato", price: "991 ₺" },
-  // Kiloluk Tatlılar
   { category: "Kiloluk Tatlılar", name: "Antep Fıstıklı Soğuk Baklava (1 kg.)", price: "991 ₺" },
   { category: "Kiloluk Tatlılar", name: "Antep Fıstıklı Soğuk Baklava (750 gr.)", price: "991 ₺" },
   { category: "Kiloluk Tatlılar", name: "Antep Fıstıklı Soğuk Baklava (500 gr.)", price: "991 ₺" },
@@ -101,7 +113,6 @@ const MENU_DATA = [
   { category: "Kiloluk Tatlılar", name: "İzmir Bombası (1 kg.)", price: "991 ₺" },
   { category: "Kiloluk Tatlılar", name: "İzmir Bombası (500 gr.)", price: "991 ₺" },
   { category: "Kiloluk Tatlılar", name: "Güllaç (1 kg.)", price: "991 ₺" },
-  // Bütün Yaş Pastalar
   { category: "Bütün Yaş Pastalar", name: "Meyveli Yaş Pasta (4-6 Kişilik)", price: "991 ₺" },
   { category: "Bütün Yaş Pastalar", name: "Profiterollü Yaş Pasta (4-6 Kişilik)", price: "991 ₺" },
   { category: "Bütün Yaş Pastalar", name: "Muzlu Çikolatalı Yaş Pasta (4-6 Kişilik)", price: "991 ₺" },
@@ -117,21 +128,6 @@ const MENU_DATA = [
   { category: "Bütün Yaş Pastalar", name: "Çikolatalı Yaş Pasta (10-12 Kişilik)", price: "991 ₺" },
   { category: "Bütün Yaş Pastalar", name: "Muzlu Çikolatalı Yaş Pasta (10-12 Kişilik)", price: "991 ₺" },
 ];
-
-// ── Kategori görselleri (Unsplash placeholder) ─
-const CATEGORY_IMAGES = {
-  "Sütlü & Çikolatalı Tatlılar": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=70",
-  "Şerbetli Tatlılar":           "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?w=400&q=70",
-  "Yan Aperatifler":             "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=70",
-  "Soğuk & Sıcak İçecekler":    "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=70",
-  "Sıcak Kahveler":              "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70",
-  "Soğuk Kahveler":              "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70",
-  "Kiloluk Tatlılar":            "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=70",
-  "Bütün Yaş Pastalar":          "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&q=70",
-};
-
-const FALLBACK_IMG   = "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=70";
-const PRODUCT_IMG    = "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=200&q=60";
 
 // ── State ──────────────────────────────────
 let allProducts = [];
@@ -161,7 +157,64 @@ const modalName        = $("modalName");
 const modalDesc        = $("modalDesc");
 const modalPrice       = $("modalPrice");
 
+// ── CSV ────────────────────────────────────
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return null;
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    // Virgülle böl ama tırnak içindeki virgülleri atla
+    const cols = [];
+    let cur = "", inQ = false;
+    for (const ch of lines[i]) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ""; }
+      else { cur += ch; }
+    }
+    cols.push(cur.trim());
+    const name     = cols[0] || "";
+    const category = cols[1] || "";
+    const rawPrice = cols[2] || "";
+    if (!name || !category) continue;
+    const price = rawPrice.replace(/TRY/gi, "₺").trim();
+    result.push({ name, category, price });
+  }
+  return result.length ? result : null;
+}
+
+async function tryFetchCSV() {
+  // Önce proxy olmadan dene
+  try {
+    const r = await fetch(CSV_SHEET, { signal: AbortSignal.timeout(5000) });
+    if (r.ok) {
+      const data = parseCSV(await r.text());
+      if (data) return data;
+    }
+  } catch (_) {}
+
+  // Proxy'lerle dene
+  for (const proxy of PROXIES) {
+    try {
+      const url = proxy + encodeURIComponent(CSV_SHEET);
+      const r = await fetch(url, { signal: AbortSignal.timeout(6000) });
+      if (r.ok) {
+        const data = parseCSV(await r.text());
+        if (data) return data;
+      }
+    } catch (_) {}
+  }
+
+  return null; // hepsi başarısız → statik veri
+}
+
 // ── Views ──────────────────────────────────
+
+function initData(products) {
+  allProducts = products;
+  categories  = [...new Set(products.map((p) => p.category))];
+  showCategoryView();
+}
 
 function showCategoryView() {
   loadingState.classList.add("hidden");
@@ -187,12 +240,10 @@ function showSearchView(query) {
   categoryView.classList.add("hidden");
   productView.classList.add("hidden");
   searchView.classList.remove("hidden");
-
   const q = query.trim().toLowerCase();
   const results = allProducts.filter(
     (p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
   );
-
   renderProductList(searchResultList, results);
   noResults.classList.toggle("hidden", results.length > 0);
 }
@@ -203,7 +254,8 @@ function renderCategories() {
   categoryGrid.innerHTML = "";
   categories.forEach((cat) => {
     const imgSrc = CATEGORY_IMAGES[cat] || FALLBACK_IMG;
-    const card = document.createElement("div");
+    const count  = allProducts.filter((p) => p.category === cat).length;
+    const card   = document.createElement("div");
     card.className = "category-card";
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
@@ -211,7 +263,10 @@ function renderCategories() {
     card.innerHTML = `
       <img src="${imgSrc}" alt="${escHtml(cat)}" loading="lazy" />
       <div class="category-overlay"></div>
-      <span class="category-name">${escHtml(cat)}</span>
+      <span class="category-name">
+        ${escHtml(cat)}
+        <span class="category-count">${count} ürün</span>
+      </span>
     `;
     card.addEventListener("click", () => showProductView(cat));
     card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") showProductView(cat); });
@@ -226,7 +281,6 @@ function renderProductList(container, items) {
     card.className = "product-card";
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
-    card.setAttribute("aria-label", product.name);
     card.innerHTML = `
       <img class="product-thumb" src="${PRODUCT_IMG}" alt="${escHtml(product.name)}" loading="lazy" />
       <div class="product-info">
@@ -247,9 +301,8 @@ function openModal(product) {
   modalImage.alt              = product.name;
   modalCategoryTag.textContent = product.category;
   modalName.textContent       = product.name;
-  modalDesc.textContent       = product.description || "";
+  modalDesc.textContent       = "";
   modalPrice.textContent      = product.price || "";
-
   productModal.classList.remove("hidden");
   productModal.classList.add("entering");
   document.body.style.overflow = "hidden";
@@ -262,7 +315,7 @@ function closeModal() {
   document.body.style.overflow = "";
 }
 
-// ── Event Listeners ────────────────────────
+// ── Events ─────────────────────────────────
 
 backBtn.addEventListener("click", showCategoryView);
 modalClose.addEventListener("click", closeModal);
@@ -299,34 +352,12 @@ function escHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
-// ── CSV Parse ──────────────────────────────
-
-function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
-  const result = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(",");
-    if (cols.length < 2) continue;
-    const name     = cols[0].trim();
-    const category = cols[1].trim();
-    const price    = cols[2] ? cols[2].replace("TRY", "₺").trim() : "";
-    if (name && category) result.push({ name, category, price });
-  }
-  return result;
-}
-
-function initData(products) {
-  allProducts = products;
-  categories  = [...new Set(products.map((p) => p.category))];
-  showCategoryView();
-}
-
 // ── Boot ───────────────────────────────────
+// CSV'yi dene, 7 saniye içinde gelmezse statik veriyle başla
 
-fetch(PROXY + encodeURIComponent(CSV_URL))
-  .then((r) => r.text())
-  .then((text) => initData(parseCSV(text)))
-  .catch(() => {
-    // CSV çekilemezse statik veriyi kullan
-    initData(MENU_DATA);
-  });
+const csvTimeout = setTimeout(() => initData(STATIC_DATA), 7000);
+
+tryFetchCSV().then((data) => {
+  clearTimeout(csvTimeout);
+  initData(data || STATIC_DATA);
+});
