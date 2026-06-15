@@ -353,11 +353,22 @@ function escHtml(str) {
 }
 
 // ── Boot ───────────────────────────────────
-// CSV'yi dene, 7 saniye içinde gelmezse statik veriyle başla
+// Anında statik veriyle başla, arka planda CSV'den fiyatları güncelle
 
-const csvTimeout = setTimeout(() => initData(STATIC_DATA), 7000);
+initData(STATIC_DATA);
 
 tryFetchCSV().then((data) => {
-  clearTimeout(csvTimeout);
-  initData(data || STATIC_DATA);
+  if (!data) return;
+  // Fiyatları arka planda güncelle
+  data.forEach((csvItem) => {
+    const match = allProducts.find(
+      (p) => p.name.trim().toLowerCase() === csvItem.name.trim().toLowerCase()
+    );
+    if (match && csvItem.price) match.price = csvItem.price;
+  });
+  // Açık olan görünümü yenile
+  if (currentView === "home") renderCategories();
+  else if (currentView === "category") {
+    renderProductList(productList, allProducts.filter((p) => p.category === productViewTitle.textContent));
+  }
 });
