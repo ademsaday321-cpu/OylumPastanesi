@@ -2,7 +2,10 @@
    OYLUM PASTANESİ — App Logic
    ============================================= */
 
-// ── Statik Menü Verisi ─────────────────────
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTba6Ya0MZ8uasBuyubcoQaFW_xOemNBldWyaryHU6lgreH8beYFfBgqzMotHhG2YZ6Eb-1KgVbCaKs/pub?output=csv";
+const PROXY   = "https://corsproxy.io/?url=";
+
+// ── Statik Menü Verisi (fallback) ──────────
 const MENU_DATA = [
   // Sütlü & Çikolatalı Tatlılar
   { category: "Sütlü & Çikolatalı Tatlılar", name: "Orman Meyveli Trileçe", price: "991 ₺" },
@@ -131,9 +134,9 @@ const FALLBACK_IMG   = "https://images.unsplash.com/photo-1565958011703-44f9829b
 const PRODUCT_IMG    = "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=200&q=60";
 
 // ── State ──────────────────────────────────
-const allProducts = MENU_DATA;
-const categories  = [...new Set(MENU_DATA.map((p) => p.category))];
-let currentView   = "home";
+let allProducts = [];
+let categories  = [];
+let currentView = "home";
 
 // ── DOM refs ───────────────────────────────
 const $ = (id) => document.getElementById(id);
@@ -296,5 +299,34 @@ function escHtml(str) {
     .replace(/"/g, "&quot;");
 }
 
+// ── CSV Parse ──────────────────────────────
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const result = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",");
+    if (cols.length < 2) continue;
+    const name     = cols[0].trim();
+    const category = cols[1].trim();
+    const price    = cols[2] ? cols[2].replace("TRY", "₺").trim() : "";
+    if (name && category) result.push({ name, category, price });
+  }
+  return result;
+}
+
+function initData(products) {
+  allProducts = products;
+  categories  = [...new Set(products.map((p) => p.category))];
+  showCategoryView();
+}
+
 // ── Boot ───────────────────────────────────
-showCategoryView();
+
+fetch(PROXY + encodeURIComponent(CSV_URL))
+  .then((r) => r.text())
+  .then((text) => initData(parseCSV(text)))
+  .catch(() => {
+    // CSV çekilemezse statik veriyi kullan
+    initData(MENU_DATA);
+  });
