@@ -51,11 +51,11 @@ body {
 .header-inner {
   max-width: 640px;
   margin: 0 auto;
-  padding: 18px 20px 16px;
+  padding: 10px 20px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
 /* Logo container — subtle glow ring */
@@ -67,7 +67,7 @@ body {
 }
 
 .logo {
-  height: 100px;
+  height: 80px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
@@ -116,7 +116,7 @@ body {
 .search-wrapper {
   position: relative;
   width: 100%;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .search-icon {
@@ -565,7 +565,7 @@ body {
 /* ── TABLET+ ────────────────────────────── */
 
 @media (min-width: 480px) {
-  .logo { height: 130px; }
+  .logo { height: 86px; }
   .slogan { font-size: 1.1rem; }
   .category-name { font-size: 0.96rem; }
   .product-thumb { width: 84px; min-width: 84px; height: 84px; }
