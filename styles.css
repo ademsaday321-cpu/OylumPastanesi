@@ -566,7 +566,7 @@ body {
 /* ── TABLET+ ────────────────────────────── */
 
 @media (min-width: 480px) {
-  .logo { height: 100px; }
+  .logo { height: 130px; }
   .slogan { font-size: 1.1rem; }
   .category-name { font-size: 0.96rem; }
   .product-thumb { width: 84px; min-width: 84px; height: 84px; }
