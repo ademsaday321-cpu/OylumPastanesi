@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Oylum Pastanesi - Ereğli'nin en lezzetli pastanesi" />
+  <title>Oylum Pastanesi</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header">
+    <div class="header-inner">
+      <img src="logomuz.png" alt="Oylum Pastanesi Logo" class="logo" />
+      <p class="slogan">Ereğli'nin en lezzetli pastanesi.</p>
+      <div class="search-wrapper">
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="search"
+          id="searchInput"
+          class="search-input"
+          placeholder="Ürün veya kategori ara..."
+          autocomplete="off"
+        />
+        <button class="search-clear" id="searchClear" aria-label="Aramayı temizle">&times;</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main-content">
+
+    <!-- Loading -->
+    <div id="loadingState" class="loading-state">
+      <div class="spinner"></div>
+      <p>Menü yükleniyor…</p>
+    </div>
+
+    <!-- Error -->
+    <div id="errorState" class="error-state hidden">
+      <p>Menü yüklenemedi. Lütfen sayfayı yenileyin.</p>
+      <button onclick="location.reload()" class="btn-retry">Tekrar Dene</button>
+    </div>
+
+    <!-- Category Grid -->
+    <section id="categoryView" class="hidden">
+      <h2 class="section-title">Kategoriler</h2>
+      <div id="categoryGrid" class="category-grid"></div>
+    </section>
+
+    <!-- Product List -->
+    <section id="productView" class="hidden">
+      <button id="backBtn" class="back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Geri
+      </button>
+      <h2 id="productViewTitle" class="section-title"></h2>
+      <div id="productList" class="product-list"></div>
+    </section>
+
+    <!-- Search Results -->
+    <section id="searchView" class="hidden">
+      <h2 class="section-title">Arama Sonuçları</h2>
+      <div id="searchResultList" class="product-list"></div>
+      <p id="noResults" class="no-results hidden">Sonuç bulunamadı.</p>
+    </section>
+
+  </main>
+
+  <!-- ===== PRODUCT MODAL ===== -->
+  <div id="productModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose" aria-label="Kapat">&times;</button>
+      <div class="modal-image-wrap">
+        <img id="modalImage" src="" alt="" class="modal-image" />
+      </div>
+      <div class="modal-body">
+        <h3 id="modalName" class="modal-name"></h3>
+        <p id="modalDesc" class="modal-desc"></p>
+        <span id="modalPrice" class="modal-price"></span>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
