@@ -2,161 +2,165 @@
    OYLUM PASTANESİ — App Logic
    ============================================= */
 
-const CSV_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTba6Ya0MZ8uasBuyubcoQaFW_xOemNBldWyaryHU6lgreH8beYFfBgqzMotHhG2YZ6Eb-1KgVbCaKs/pub?output=csv";
-
-// Placeholder images per category (Unsplash, royalty-free)
-const CATEGORY_PLACEHOLDERS = [
-  "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=70",
-  "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=70",
-  "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=70",
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=70",
-  "https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=400&q=70",
-  "https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=400&q=70",
-  "https://images.unsplash.com/photo-1499195333224-3ce974eecb47?w=400&q=70",
-  "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=70",
+// ── Statik Menü Verisi ─────────────────────
+const MENU_DATA = [
+  // Sütlü & Çikolatalı Tatlılar
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Orman Meyveli Trileçe", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Karamelli Trileçe", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Supangle", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "San Sebastian", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Profiterol", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Sufle", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Donut", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Fırın Sütlaç", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Kazan Dibi", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Çilekli Magnolia", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Lotuslu Magnolia", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Tiramisu", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Makaron", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Çikolatalı Yaş Pasta", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Meyveli Yaş Pasta", price: "" },
+  { category: "Sütlü & Çikolatalı Tatlılar", name: "Mini Ekler", price: "" },
+  // Şerbetli Tatlılar
+  { category: "Şerbetli Tatlılar", name: "Fıstıklı Baklava (Tereyağlı)", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Soğuk Baklava", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Bülbül Yuvası (Tereyağlı)", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Cevizli Baklava (Tereyağlı)", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Cevizli Sultan (Tereyağlı)", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Cevizli Mekik (Tereyağlı)", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Cevizli Burma Kadayıf", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Şekerpare", price: "" },
+  { category: "Şerbetli Tatlılar", name: "Tulumba", price: "" },
+  // Yan Aperatifler
+  { category: "Yan Aperatifler", name: "Kuru Pasta", price: "" },
+  { category: "Yan Aperatifler", name: "Elmalı Kurabiye", price: "" },
+  { category: "Yan Aperatifler", name: "İzmir Bombası", price: "" },
+  { category: "Yan Aperatifler", name: "Su Böreği", price: "" },
+  // Soğuk & Sıcak İçecekler
+  { category: "Soğuk & Sıcak İçecekler", name: "Limonata (El Yapımı)", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Basil (Fesleğen Tohumlu İçecek)", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Mojito", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Kola", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Fanta", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Meyve Suyu", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Fuse Tea", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Bubble Tea", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Gazoz", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Meyveli Soda", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Su", price: "" },
+  { category: "Soğuk & Sıcak İçecekler", name: "Çay", price: "" },
+  // Sıcak Kahveler
+  { category: "Sıcak Kahveler", name: "Türk Kahvesi", price: "" },
+  { category: "Sıcak Kahveler", name: "Nescafe", price: "" },
+  { category: "Sıcak Kahveler", name: "Latte Macchiato", price: "" },
+  { category: "Sıcak Kahveler", name: "Cappuccino", price: "" },
+  { category: "Sıcak Kahveler", name: "Americano", price: "" },
+  { category: "Sıcak Kahveler", name: "Latte", price: "" },
+  { category: "Sıcak Kahveler", name: "Cafe Au Lait", price: "" },
+  { category: "Sıcak Kahveler", name: "Flat White", price: "" },
+  { category: "Sıcak Kahveler", name: "Caffe Crema", price: "" },
+  { category: "Sıcak Kahveler", name: "Espresso", price: "" },
+  // Soğuk Kahveler
+  { category: "Soğuk Kahveler", name: "Latte", price: "" },
+  { category: "Soğuk Kahveler", name: "Cafe Au Lait", price: "" },
+  { category: "Soğuk Kahveler", name: "Cappuccino", price: "" },
+  { category: "Soğuk Kahveler", name: "Americano", price: "" },
+  { category: "Soğuk Kahveler", name: "Caffe Crema", price: "" },
+  { category: "Soğuk Kahveler", name: "Espresso", price: "" },
+  { category: "Soğuk Kahveler", name: "Affogato", price: "" },
+  // Kiloluk Tatlılar
+  { category: "Kiloluk Tatlılar", name: "Antep Fıstıklı Soğuk Baklava (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Antep Fıstıklı Soğuk Baklava (750 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Antep Fıstıklı Soğuk Baklava (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Cevizli Baklava (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Cevizli Baklava (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Fıstıklı Baklava (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Fıstıklı Baklava (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Cevizli Kadayıf (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Cevizli Kadayıf (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Cevizli Sultan (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tereyağlı Cevizli Sultan (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Şekerpare (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Karamelli Trileçe (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Karamelli Trileçe (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Orman Meyveli Trileçe (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Orman Meyveli Trileçe (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Mini Ekler (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Mini Ekler (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tatlı Kuru Pasta (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tatlı Kuru Pasta (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tuzlu Kuru Pasta (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tuzlu Kuru Pasta (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Tuzlu Kuru Pasta (250 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Karışık Kuru Pasta (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Karışık Kuru Pasta (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Karışık Kuru Pasta (250 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "İzmir Bombası (1 kg.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "İzmir Bombası (500 gr.)", price: "" },
+  { category: "Kiloluk Tatlılar", name: "Güllaç (1 kg.)", price: "" },
+  // Bütün Yaş Pastalar
+  { category: "Bütün Yaş Pastalar", name: "Meyveli Yaş Pasta (4-6 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Profiterollü Yaş Pasta (4-6 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Muzlu Çikolatalı Yaş Pasta (4-6 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Çikolatalı Yaş Pasta (4-6 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Antep Fıstıklı & Çikolatalı Yaş Pasta (4-6 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Orman Meyveli Çikolatalı Yaş Pasta (4-6 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Meyveli Yaş Pasta (8 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Profiterollü Yaş Pasta (8 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Muzlu Çikolatalı Yaş Pasta (8 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Çikolatalı Yaş Pasta (8 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Antep Fıstıklı & Çikolatalı Pasta (8 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Orman Meyveli Çikolatalı Yaş Pasta (8 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Çikolatalı Yaş Pasta (10-12 Kişilik)", price: "" },
+  { category: "Bütün Yaş Pastalar", name: "Muzlu Çikolatalı Yaş Pasta (10-12 Kişilik)", price: "" },
 ];
 
-const PRODUCT_PLACEHOLDER =
-  "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=200&q=60";
+// ── Kategori görselleri (Unsplash placeholder) ─
+const CATEGORY_IMAGES = {
+  "Sütlü & Çikolatalı Tatlılar": "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=400&q=70",
+  "Şerbetli Tatlılar":           "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?w=400&q=70",
+  "Yan Aperatifler":             "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=70",
+  "Soğuk & Sıcak İçecekler":    "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=70",
+  "Sıcak Kahveler":              "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&q=70",
+  "Soğuk Kahveler":              "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=70",
+  "Kiloluk Tatlılar":            "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=400&q=70",
+  "Bütün Yaş Pastalar":          "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&q=70",
+};
+
+const FALLBACK_IMG   = "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&q=70";
+const PRODUCT_IMG    = "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=200&q=60";
 
 // ── State ──────────────────────────────────
-let allProducts = [];       // { category, name, description, price }
-let categories = [];        // unique category names in order
-let currentView = "home";   // "home" | "category" | "search"
-let currentCategory = null;
+const allProducts = MENU_DATA;
+const categories  = [...new Set(MENU_DATA.map((p) => p.category))];
+let currentView   = "home";
 
 // ── DOM refs ───────────────────────────────
 const $ = (id) => document.getElementById(id);
 
-const loadingState    = $("loadingState");
-const errorState      = $("errorState");
-const categoryView    = $("categoryView");
-const productView     = $("productView");
-const searchView      = $("searchView");
-const categoryGrid    = $("categoryGrid");
-const productList     = $("productList");
-const searchResultList= $("searchResultList");
-const productViewTitle= $("productViewTitle");
-const noResults       = $("noResults");
-const searchInput     = $("searchInput");
-const searchClear     = $("searchClear");
-const backBtn         = $("backBtn");
-const productModal    = $("productModal");
-const modalClose      = $("modalClose");
-const modalImage      = $("modalImage");
-const modalName       = $("modalName");
-const modalDesc       = $("modalDesc");
-const modalPrice      = $("modalPrice");
-
-// ── CSV Parsing ────────────────────────────
-
-function parseCSV(raw) {
-  const lines = raw.trim().split(/\r?\n/);
-  if (lines.length < 2) return [];
-
-  const headers = splitCSVLine(lines[0]).map((h) => h.trim().toLowerCase()
-    .replace(/ı/g, "i").replace(/ş/g, "s").replace(/ü/g, "u")
-    .replace(/ö/g, "o").replace(/ç/g, "c").replace(/ğ/g, "g"));
-
-  const idx = {
-    name:     findCol(headers, ["urun adi", "urun", "name", "ad", "isim", "product", "urunadi"]),
-    category: findCol(headers, ["kategorisi", "kategori", "category", "grup", "group"]),
-    price:    findCol(headers, ["fiyati", "fiyat", "price", "ucret", "tutar"]),
-  };
-
-  const products = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const cols = splitCSVLine(lines[i]);
-    if (!cols.length || cols.every((c) => !c.trim())) continue;
-
-    const get = (key) => (idx[key] !== -1 && cols[idx[key]] ? cols[idx[key]].trim() : "");
-
-    const name     = get("name");
-    const category = get("category");
-    const rawPrice = get("price");
-
-    if (!category || !name) continue;
-
-    products.push({
-      category,
-      name,
-      description: "",
-      price: formatPrice(rawPrice),
-    });
-  }
-
-  return products;
-}
-
-function findCol(headers, candidates) {
-  for (const c of candidates) {
-    const needle = c.replace(/[\s_-]/g, "");
-    const idx = headers.findIndex((h) => h.replace(/[\s_-]/g, "").includes(needle));
-    if (idx !== -1) return idx;
-  }
-  return -1;
-}
-
-function splitCSVLine(line) {
-  const result = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-      else { inQuotes = !inQuotes; }
-    } else if (ch === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  result.push(current);
-  return result;
-}
-
-function formatPrice(raw) {
-  if (!raw) return "";
-  // Remove non-numeric except dot/comma
-  const cleaned = raw.replace(/[^\d.,]/g, "").replace(",", ".");
-  const num = parseFloat(cleaned);
-  if (isNaN(num)) return raw;
-  return num.toLocaleString("tr-TR", { style: "currency", currency: "TRY", maximumFractionDigits: 2 });
-}
-
-// ── Data Loading ───────────────────────────
-
-async function loadMenu() {
-  try {
-    const res = await fetch(CSV_URL);
-    if (!res.ok) throw new Error("Network response was not ok");
-    const text = await res.text();
-    allProducts = parseCSV(text);
-
-    // Preserve insertion order of categories
-    const seen = new Set();
-    allProducts.forEach((p) => {
-      if (!seen.has(p.category)) { seen.add(p.category); categories.push(p.category); }
-    });
-
-    showCategoryView();
-  } catch (err) {
-    console.error("CSV load error:", err);
-    loadingState.classList.add("hidden");
-    errorState.classList.remove("hidden");
-  }
-}
+const loadingState     = $("loadingState");
+const categoryView     = $("categoryView");
+const productView      = $("productView");
+const searchView       = $("searchView");
+const categoryGrid     = $("categoryGrid");
+const productList      = $("productList");
+const searchResultList = $("searchResultList");
+const productViewTitle = $("productViewTitle");
+const noResults        = $("noResults");
+const searchInput      = $("searchInput");
+const searchClear      = $("searchClear");
+const backBtn          = $("backBtn");
+const productModal     = $("productModal");
+const modalClose       = $("modalClose");
+const modalImage       = $("modalImage");
+const modalName        = $("modalName");
+const modalDesc        = $("modalDesc");
+const modalPrice       = $("modalPrice");
 
 // ── Views ──────────────────────────────────
 
 function showCategoryView() {
   loadingState.classList.add("hidden");
-  errorState.classList.add("hidden");
   productView.classList.add("hidden");
   searchView.classList.add("hidden");
   categoryView.classList.remove("hidden");
@@ -165,14 +169,12 @@ function showCategoryView() {
 }
 
 function showProductView(category) {
-  currentCategory = category;
   currentView = "category";
   categoryView.classList.add("hidden");
   searchView.classList.add("hidden");
   productView.classList.remove("hidden");
   productViewTitle.textContent = category;
-  const items = allProducts.filter((p) => p.category === category);
-  renderProductList(productList, items);
+  renderProductList(productList, allProducts.filter((p) => p.category === category));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -184,10 +186,7 @@ function showSearchView(query) {
 
   const q = query.trim().toLowerCase();
   const results = allProducts.filter(
-    (p) =>
-      p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q)
+    (p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
   );
 
   renderProductList(searchResultList, results);
@@ -198,8 +197,8 @@ function showSearchView(query) {
 
 function renderCategories() {
   categoryGrid.innerHTML = "";
-  categories.forEach((cat, i) => {
-    const imgSrc = CATEGORY_PLACEHOLDERS[i % CATEGORY_PLACEHOLDERS.length];
+  categories.forEach((cat) => {
+    const imgSrc = CATEGORY_IMAGES[cat] || FALLBACK_IMG;
     const card = document.createElement("div");
     card.className = "category-card";
     card.setAttribute("role", "button");
@@ -225,12 +224,9 @@ function renderProductList(container, items) {
     card.setAttribute("tabindex", "0");
     card.setAttribute("aria-label", product.name);
     card.innerHTML = `
-      <img class="product-thumb" src="${PRODUCT_PLACEHOLDER}" alt="${escHtml(product.name)}" loading="lazy" />
+      <img class="product-thumb" src="${PRODUCT_IMG}" alt="${escHtml(product.name)}" loading="lazy" />
       <div class="product-info">
-        <div>
-          <div class="product-name">${escHtml(product.name)}</div>
-          ${product.description ? `<div class="product-desc">${escHtml(product.description)}</div>` : ""}
-        </div>
+        <div class="product-name">${escHtml(product.name)}</div>
         ${product.price ? `<div class="product-footer"><span class="product-price">${escHtml(product.price)}</span></div>` : ""}
       </div>
     `;
@@ -243,8 +239,8 @@ function renderProductList(container, items) {
 // ── Modal ──────────────────────────────────
 
 function openModal(product) {
-  modalImage.src  = PRODUCT_PLACEHOLDER;
-  modalImage.alt  = product.name;
+  modalImage.src         = CATEGORY_IMAGES[product.category] || PRODUCT_IMG;
+  modalImage.alt         = product.name;
   modalName.textContent  = product.name;
   modalDesc.textContent  = product.description || "";
   modalPrice.textContent = product.price || "";
@@ -252,10 +248,7 @@ function openModal(product) {
   productModal.classList.remove("hidden");
   productModal.classList.add("entering");
   document.body.style.overflow = "hidden";
-
-  // Remove animation class after it ends so it re-triggers next time
   productModal.addEventListener("animationend", () => productModal.classList.remove("entering"), { once: true });
-
   modalClose.focus();
 }
 
@@ -267,12 +260,8 @@ function closeModal() {
 // ── Event Listeners ────────────────────────
 
 backBtn.addEventListener("click", showCategoryView);
-
 modalClose.addEventListener("click", closeModal);
-productModal.addEventListener("click", (e) => {
-  if (e.target === productModal) closeModal();
-});
-
+productModal.addEventListener("click", (e) => { if (e.target === productModal) closeModal(); });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !productModal.classList.contains("hidden")) closeModal();
 });
@@ -281,14 +270,10 @@ let searchTimer;
 searchInput.addEventListener("input", () => {
   const val = searchInput.value;
   searchClear.classList.toggle("visible", val.length > 0);
-
   clearTimeout(searchTimer);
   searchTimer = setTimeout(() => {
-    if (val.trim().length >= 1) {
-      showSearchView(val);
-    } else if (currentView === "search") {
-      showCategoryView();
-    }
+    if (val.trim().length >= 1) showSearchView(val);
+    else if (currentView === "search") showCategoryView();
   }, 280);
 });
 
@@ -310,4 +295,4 @@ function escHtml(str) {
 }
 
 // ── Boot ───────────────────────────────────
-loadMenu();
+showCategoryView();
