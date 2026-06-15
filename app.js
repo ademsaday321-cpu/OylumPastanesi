@@ -153,6 +153,7 @@ const backBtn          = $("backBtn");
 const productModal     = $("productModal");
 const modalClose       = $("modalClose");
 const modalImage       = $("modalImage");
+const modalCategoryTag = $("modalCategoryTag");
 const modalName        = $("modalName");
 const modalDesc        = $("modalDesc");
 const modalPrice       = $("modalPrice");
@@ -239,11 +240,12 @@ function renderProductList(container, items) {
 // ── Modal ──────────────────────────────────
 
 function openModal(product) {
-  modalImage.src         = CATEGORY_IMAGES[product.category] || PRODUCT_IMG;
-  modalImage.alt         = product.name;
-  modalName.textContent  = product.name;
-  modalDesc.textContent  = product.description || "";
-  modalPrice.textContent = product.price || "";
+  modalImage.src              = CATEGORY_IMAGES[product.category] || PRODUCT_IMG;
+  modalImage.alt              = product.name;
+  modalCategoryTag.textContent = product.category;
+  modalName.textContent       = product.name;
+  modalDesc.textContent       = product.description || "";
+  modalPrice.textContent      = product.price || "";
 
   productModal.classList.remove("hidden");
   productModal.classList.add("entering");
