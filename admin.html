@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oylum Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --brand:       #c0622a;
+      --brand-dark:  #9a4a1c;
+      --brand-light: #f5e6da;
+      --gold:        #d4a853;
+      --bg:          #fdf9f5;
+      --surface:     #ffffff;
+      --text:        #1c1612;
+      --text-muted:  #7a6a5a;
+      --border:      #ede4d8;
+      --radius:      14px;
+      --radius-sm:   8px;
+      --shadow:      0 2px 16px rgba(0,0,0,0.07);
+      --shadow-md:   0 8px 32px rgba(0,0,0,0.13);
+      --transition:  0.2s ease;
+      --danger:      #d32f2f;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; -webkit-font-smoothing: antialiased; }
+
+    /* ── LOGIN ── */
+    #loginView {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(160deg, #1a0e08 0%, #2e1a0e 60%, #3d2410 100%);
+      padding: 24px;
+    }
+    .login-card {
+      background: var(--surface);
+      border-radius: 20px;
+      padding: 36px 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .login-logo { height: 72px; width: auto; object-fit: contain; }
+    .login-card h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--text);
+    }
+    .login-card input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color var(--transition);
+      background: var(--bg);
+    }
+    .login-card input:focus { border-color: var(--brand); }
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-primary:hover { background: var(--brand-dark); }
+    .btn-primary:disabled { background: #bbb; cursor: not-allowed; }
+    .error-msg { color: var(--danger); font-size: 0.85rem; text-align: center; min-height: 18px; }
+
+    /* ── ADMIN HEADER ── */
+    #adminView { display: none; flex-direction: column; min-height: 100dvh; }
+    .admin-header {
+      background: linear-gradient(160deg, #1a0e08 0%, #2e1a0e 100%);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    }
+    .admin-header-left { display: flex; align-items: center; gap: 12px; }
+    .admin-header-logo { height: 40px; width: auto; object-fit: contain; }
+    .admin-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--gold);
+    }
+    .btn-logout {
+      padding: 7px 16px;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.85);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50px;
+      font-size: 0.83rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-logout:hover { background: rgba(255,255,255,0.2); }
+
+    /* ── TABS ── */
+    .admin-tabs {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+    }
+    .tab-btn {
+      padding: 14px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font-size: 0.93rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition);
+    }
+    .tab-btn.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+    /* ── TAB CONTENT ── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .admin-main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+    }
+    .section-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .section-bar h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+    }
+    .btn-add {
+      padding: 9px 18px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background var(--transition);
+      white-space: nowrap;
+    }
+    .btn-add:hover { background: var(--brand-dark); }
+
+    /* ── LIST ITEMS ── */
+    .admin-list { display: flex; flex-direction: column; gap: 10px; }
+    .admin-item {
+      display: grid;
+      grid-template-columns: 56px 1fr auto;
+      grid-template-rows: auto;
+      align-items: center;
+      gap: 0 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+    }
+    .admin-item-img {
+      grid-row: 1;
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--brand-light), var(--border));
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .admin-item-img img {
+      width: 56px;
+      height: 56px;
+      border-radius: 10px;
+      object-fit: cover;
+      display: block;
+    }
+    .admin-item-info {
+      grid-row: 1;
+      min-width: 0;
+    }
+    .admin-item-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .admin-item-sub {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .admin-item-actions {
+      grid-row: 1;
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+      align-items: center;
+    }
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: background var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn-icon:hover  { background: var(--brand-light); }
+    .btn-icon:active { opacity: 0.7; }
+    .btn-icon.danger:hover { background: #fde8e8; border-color: #f5c6c6; }
+
+    /* ── FİYAT INPUT WRAPPER ── */
+    .price-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .price-input-wrap input {
+      width: 100%;
+      padding-right: 46px !important;
+    }
+    .price-suffix {
+      position: absolute;
+      right: 12px;
+      font-size: 0.93rem;
+      font-weight: 700;
+      color: var(--brand);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── MOBİL UYUMLU OVERRIDES ── */
+    @media (max-width: 520px) {
+      /* Header */
+      .admin-header { padding: 8px 12px; }
+      .admin-header h1 { font-size: 0.9rem; }
+      .admin-header-logo { height: 30px; }
+      .btn-logout { padding: 5px 10px; font-size: 0.75rem; }
+
+      /* Tabs — eşit genişlik */
+      .admin-tabs { padding: 0; }
+      .tab-btn { flex: 1; text-align: center; padding: 11px 8px; font-size: 0.85rem; }
+
+      /* Main */
+      .admin-main { padding: 14px 12px 80px; }
+      .section-bar { margin-bottom: 12px; gap: 8px; }
+      .section-bar h2 { font-size: 1rem; }
+      .btn-add { padding: 9px 14px; font-size: 0.82rem; }
+
+      /* ── List item: mobilede 2 satır layout ──
+         Satır 1: foto (sol) | isim+alt yazı (orta)
+         Satır 2: butonlar (sağa hizalı, foto sütununun sağından başlar)
+      */
+      .admin-item {
+        grid-template-columns: 52px 1fr;
+        grid-template-rows: auto auto;
+        gap: 4px 10px;
+        padding: 10px 12px;
+      }
+      .admin-item-img {
+        grid-column: 1;
+        grid-row: 1 / 3;   /* foto her iki satırı da kaplasın */
+        width: 52px;
+        height: 52px;
+        border-radius: 9px;
+        font-size: 1.2rem;
+        align-self: center;
+      }
+      .admin-item-img img { width: 52px; height: 52px; border-radius: 9px; }
+
+      .admin-item-info {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: end;
+      }
+      .admin-item-name { font-size: 0.88rem; }
+      .admin-item-sub  { font-size: 0.73rem; }
+
+      .admin-item-actions {
+        grid-column: 2;
+        grid-row: 2;
+        justify-content: flex-start;  /* butonlar sola */
+        gap: 8px;
+        align-self: start;
+        padding-top: 2px;
+      }
+      .btn-icon {
+        width: 42px;
+        height: 36px;
+        font-size: 1.05rem;
+        border-radius: 8px;
+        flex: 1;              /* eşit genişlik */
+        max-width: 80px;
+      }
+
+      /* Filtre */
+      .filter-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .filter-select { width: 100%; font-size: 0.9rem; padding: 10px 12px; }
+
+      /* Form modal */
+      .modal-overlay { padding: 12px; }
+      .form-modal {
+        border-radius: 16px;
+        max-height: 92dvh;
+        padding: 20px 14px 28px;
+      }
+      .form-modal h2 { font-size: 1.05rem; margin-bottom: 14px; padding-right: 32px; }
+      .field { margin-bottom: 12px; }
+      .field label { font-size: 0.78rem; }
+      .field input,
+      .field textarea,
+      .field select { font-size: 0.95rem; padding: 11px 12px; }
+
+      /* Form butonları alt alta */
+      .form-actions { flex-direction: column-reverse; gap: 8px; }
+      .btn-save, .btn-cancel { width: 100%; padding: 13px; font-size: 0.95rem; }
+    }
+
+    /* ── FILTER ── */
+    .filter-row { display: flex; gap: 10px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .filter-select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-family: 'Inter', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+    }
+    .filter-select:focus { border-color: var(--brand); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,5,2,0.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .form-modal {
+      background: var(--surface);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90dvh;
+      overflow-y: auto;
+      padding: 28px 24px 32px;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+    .form-modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem;
+      margin-bottom: 20px;
+    }
+    .form-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--border);
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+    .form-close:hover { background: #ddd; }
+
+    /* ── FORM FIELDS ── */
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .field label { font-size: 0.82rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .field input,
+    .field textarea,
+    .field select {
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.93rem;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--transition);
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--brand); }
+    .field textarea { resize: vertical; min-height: 72px; }
+
+    /* ── IMAGE UPLOAD ── */
+    .upload-area {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition);
+      position: relative;
+    }
+    .upload-area:hover { border-color: var(--brand); background: var(--brand-light); }
+    .upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-area-text { font-size: 0.85rem; color: var(--text-muted); pointer-events: none; }
+    .upload-area-text strong { color: var(--brand); }
+
+    .preview-wrap {
+      margin-top: 10px;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: none;
+    }
+    .preview-wrap.visible { display: block; }
+    .preview-wrap img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+    .preview-info { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── SAVE BUTTON ROW ── */
+    .form-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-save {
+      flex: 1;
+      padding: 12px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      transition: background var(--transition);
+    }
+    .btn-save:hover { background: var(--brand-dark); }
+    .btn-save:disabled { background: #bbb; cursor: not-allowed; }
+    .btn-cancel {
+      padding: 12px 20px;
+      background: var(--bg);
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.93rem;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1c1612;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      z-index: 300;
+      transition: transform 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 48px 0; color: var(--text-muted); font-size: 0.9rem; }
+
+    /* ── SPINNER INLINE ── */
+    .spinner-sm {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== GİRİŞ ===== -->
+  <div id="loginView">
+    <div class="login-card">
+      <img src="logomuz.png" alt="Oylum Pastanesi" class="login-logo" />
+      <h1>Admin Paneli</h1>
+      <input type="email"    id="emailInput"    placeholder="E-posta adresi" autocomplete="username" />
+      <input type="password" id="passwordInput" placeholder="Şifre"          autocomplete="current-password" />
+      <button class="btn-primary" id="loginBtn">Giriş Yap</button>
+      <p class="error-msg" id="loginError"></p>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN PANELİ ===== -->
+  <div id="adminView">
+    <header class="admin-header">
+      <div class="admin-header-left">
+        <img src="logomuz.png" alt="Oylum" class="admin-header-logo" />
+        <h1>Admin Paneli</h1>
+      </div>
+      <button class="btn-logout" id="logoutBtn">Çıkış Yap</button>
+    </header>
+
+    <nav class="admin-tabs">
+      <button class="tab-btn active" data-tab="categories">Kategoriler</button>
+      <button class="tab-btn"        data-tab="products">Ürünler</button>
+    </nav>
+
+    <main class="admin-main">
+
+      <!-- KATEGORİLER -->
+      <div id="tabCategories" class="tab-content active">
+        <div class="section-bar">
+          <h2>Kategoriler</h2>
+          <button class="btn-add" id="addCategoryBtn">+ Yeni Kategori</button>
+        </div>
+        <div id="categoryAdminList" class="admin-list"></div>
+      </div>
+
+      <!-- ÜRÜNLER -->
+      <div id="tabProducts" class="tab-content">
+        <div class="section-bar">
+          <h2>Ürünler</h2>
+          <button class="btn-add" id="addProductBtn">+ Yeni Ürün</button>
+        </div>
+        <div class="filter-row">
+          <select class="filter-select" id="categoryFilter">
+            <option value="">Tüm kategoriler</option>
+          </select>
+        </div>
+        <div id="productAdminList" class="admin-list"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ===== FORM MODAL ===== -->
+  <div id="formModal" class="modal-overlay hidden">
+    <div class="form-modal">
+      <button class="form-close" id="formModalClose">&times;</button>
+      <h2 id="formTitle">Kategori Ekle</h2>
+
+      <!-- Kategori alanları -->
+      <div id="fieldsCat">
+        <div class="field">
+          <label>Kategori Adı</label>
+          <input type="text" id="catName" placeholder="örn. Yaş Pastalar" />
+        </div>
+        <div class="field">
+          <label>Sıra Numarası</label>
+          <input type="number" id="catOrder" placeholder="1" min="1" />
+        </div>
+        <div class="field">
+          <label>Kategori Fotoğrafı</label>
+          <div class="upload-area" id="catUploadArea">
+            <input type="file" id="catImageInput" accept="image/*" />
+            <div class="upload-area-text">
+              <strong>Fotoğraf seç</strong> veya sürükle bırak<br>
+              <span style="font-size:0.75rem;">Otomatik WebP sıkıştırma uygulanır</span>
+            </div>
+          </div>
+          <div class="preview-wrap" id="catPreviewWrap">
+            <img id="catPreviewImg" src="" alt="Önizleme" />
+            <p class="preview-info" id="catPreviewInfo"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ürün alanları -->
+      <div id="fieldsProd" class="hidden">
+        <div class="field">
+          <label>Ürün Adı</label>
+          <input type="text" id="prodName" placeholder="örn. Karamelli Trileçe" />
+        </div>
+        <div class="field">
+          <label>Kısa Açıklama</label>
+          <textarea id="prodDesc" placeholder="Ürün hakkında kısa bilgi..."></textarea>
+        </div>
+        <div class="field">
+          <label>Fiyat</label>
+          <div class="price-input-wrap">
+            <input type="number" id="prodPrice" placeholder="180" min="0" step="1" inputmode="numeric" />
+            <span class="price-suffix">₺</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Kategori</label>
+          <select id="prodCategory"></select>
+        </div>
+        <div class="field">
+          <label>Sıra Numarası (Kategori İçinde)</label>
+          <input type="number" id="prodOrder" placeholder="1" min="1" />
+        </div>
+        <div class="field">
+          <label>Ürün Fotoğrafı</label>
+          <div class="upload-area" id="prodUploadArea">
+            <input type="file" id="prodImageInput" accept="image/*" />
+            <div class="upload-area-text">
+              <strong>Fotoğraf seç</strong> veya sürükle bırak<br>
+              <span style="font-size:0.75rem;">Otomatik WebP sıkıştırma uygulanır</span>
+            </div>
+          </div>
+          <div class="preview-wrap" id="prodPreviewWrap">
+            <img id="prodPreviewImg" src="" alt="Önizleme" />
+            <p class="preview-info" id="prodPreviewInfo"></p>
+          </div>
+        </div>
+      </div>
+
+      <p class="error-msg" id="formError" style="margin-bottom:8px;"></p>
+      <div class="form-actions">
+        <button class="btn-cancel" id="formCancelBtn">İptal</button>
+        <button class="btn-save"   id="formSaveBtn">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast"></div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // ── Firebase Init ──────────────────────
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCGuwpUKpeI4IEJurujflT42xYwAylQ-o",
+      authDomain: "oylumpasatanesi.firebaseapp.com",
+      projectId: "oylumpasatanesi",
+      storageBucket: "oylumpasatanesi.firebasestorage.app",
+      messagingSenderId: "41977955233",
+      appId: "1:41977955233:web:62d2682c4c01be524e01e0"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    // ── Cloudinary ─────────────────────────
+    const CLOUDINARY_CLOUD  = "ddiqm2yqa";
+    const CLOUDINARY_PRESET = "oylum_menu";
+
+    // ── State ──────────────────────────────
+    let categories = [];       // { id, name, imageUrl, order }
+    let products   = [];       // { id, name, description, price, imageUrl, categoryId, order }
+    let editingId  = null;     // Firestore doc ID being edited
+    let formMode   = "cat";    // "cat" | "prod"
+    let pendingImageBlob = null;
+    let pendingImageName = "";
+
+    // ── DOM refs ───────────────────────────
+    const loginView       = document.getElementById("loginView");
+    const adminView       = document.getElementById("adminView");
+    const emailInput      = document.getElementById("emailInput");
+    const passwordInput   = document.getElementById("passwordInput");
+    const loginBtn        = document.getElementById("loginBtn");
+    const loginError      = document.getElementById("loginError");
+    const logoutBtn       = document.getElementById("logoutBtn");
+    const formModal       = document.getElementById("formModal");
+    const formTitle       = document.getElementById("formTitle");
+    const formSaveBtn     = document.getElementById("formSaveBtn");
+    const formCancelBtn   = document.getElementById("formCancelBtn");
+    const formModalClose  = document.getElementById("formModalClose");
+    const formError       = document.getElementById("formError");
+    const fieldsCat       = document.getElementById("fieldsCat");
+    const fieldsProd      = document.getElementById("fieldsProd");
+    const toastEl         = document.getElementById("toast");
+    const categoryFilter  = document.getElementById("categoryFilter");
+
+    // ── Toast ──────────────────────────────
+    let toastTimer;
+    function showToast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2800);
+    }
+
+    // ── Auth ───────────────────────────────
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loginView.style.display  = "none";
+        adminView.style.display  = "flex";
+        loadAll();
+      } else {
+        loginView.style.display  = "flex";
+        adminView.style.display  = "none";
+      }
+    });
+
+    loginBtn.addEventListener("click", async () => {
+      loginError.textContent = "";
+      const email = emailInput.value.trim();
+      const pass  = passwordInput.value;
+      if (!email || !pass) { loginError.textContent = "E-posta ve şifre girin."; return; }
+      loginBtn.disabled = true;
+      try {
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (err) {
+        loginError.textContent = authErrMsg(err.code);
+        loginBtn.disabled = false;
+      }
+    });
+
+    passwordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") loginBtn.click(); });
+
+    logoutBtn.addEventListener("click", () => auth.signOut());
+
+    function authErrMsg(code) {
+      if (code === "auth/wrong-password" || code === "auth/invalid-credential") return "Şifre yanlış.";
+      if (code === "auth/user-not-found")  return "Bu e-posta ile kayıtlı kullanıcı yok.";
+      if (code === "auth/invalid-email")   return "Geçersiz e-posta adresi.";
+      if (code === "auth/too-many-requests") return "Çok fazla deneme. Lütfen bekleyin.";
+      return "Giriş başarısız. Tekrar dene.";
+    }
+
+    // ── Data loading ───────────────────────
+    async function loadAll() {
+      try {
+        const [catSnap, prodSnap] = await Promise.all([
+          db.collection("categories").orderBy("order").get(),
+          db.collection("products").orderBy("order").get(),
+        ]);
+        categories = catSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        products   = prodSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderCategoryList();
+        renderProductList();
+        populateCategorySelects();
+      } catch (err) {
+        showToast("Veri yüklenemedi: " + err.message);
+      }
+    }
+
+    // ── Render helpers ─────────────────────
+    function imgCell(url, emoji) {
+      const wrap = document.createElement("div");
+      wrap.className = "admin-item-img";
+      if (url) {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "";
+        wrap.appendChild(img);
+      } else {
+        wrap.textContent = emoji;
+      }
+      return wrap;
+    }
+
+    function actionButtons(editFn, deleteFn) {
+      const wrap = document.createElement("div");
+      wrap.className = "admin-item-actions";
+      const editBtn = document.createElement("button");
+      editBtn.className = "btn-icon";
+      editBtn.title = "Düzenle";
+      editBtn.textContent = "✏️";
+      editBtn.addEventListener("click", editFn);
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn-icon danger";
+      delBtn.title = "Sil";
+      delBtn.textContent = "🗑️";
+      delBtn.addEventListener("click", deleteFn);
+      wrap.appendChild(editBtn);
+      wrap.appendChild(delBtn);
+      return wrap;
+    }
+
+    function renderCategoryList() {
+      const list = document.getElementById("categoryAdminList");
+      list.innerHTML = "";
+      if (!categories.length) {
+        list.innerHTML = '<div class="empty-state">Henüz kategori yok. Yeni kategori ekle.</div>';
+        return;
+      }
+      categories.forEach((cat) => {
+        const item = document.createElement("div");
+        item.className = "admin-item";
+        item.appendChild(imgCell(cat.imageUrl, "📁"));
+        const info = document.createElement("div");
+        info.className = "admin-item-info";
+        info.innerHTML = `<div class="admin-item-name">${escHtml(cat.name)}</div>
+          <div class="admin-item-sub">Sıra: ${cat.order} &nbsp;·&nbsp; ${products.filter(p => p.categoryId === cat.id).length} ürün</div>`;
+        item.appendChild(info);
+        item.appendChild(actionButtons(
+          () => openCatForm(cat),
+          () => deleteCategory(cat)
+        ));
+        list.appendChild(item);
+      });
+    }
+
+    function renderProductList() {
+      const list = document.getElementById("productAdminList");
+      list.innerHTML = "";
+      const filterVal = categoryFilter.value;
+      const filtered  = filterVal ? products.filter(p => p.categoryId === filterVal) : products;
+      if (!filtered.length) {
+        list.innerHTML = '<div class="empty-state">Ürün bulunamadı.</div>';
+        return;
+      }
+      filtered.forEach((prod) => {
+        const cat  = categories.find(c => c.id === prod.categoryId);
+        const item = document.createElement("div");
+        item.className = "admin-item";
+        item.appendChild(imgCell(prod.imageUrl, "🧁"));
+        const info = document.createElement("div");
+        info.className = "admin-item-info";
+        info.innerHTML = `<div class="admin-item-name">${escHtml(prod.name)}</div>
+          <div class="admin-item-sub">${escHtml(cat ? cat.name : prod.categoryId)} &nbsp;·&nbsp; ${escHtml(prod.price || '—')}</div>`;
+        item.appendChild(info);
+        item.appendChild(actionButtons(
+          () => openProdForm(prod),
+          () => deleteProduct(prod)
+        ));
+        list.appendChild(item);
+      });
+    }
+
+    function populateCategorySelects() {
+      // Filter dropdown
+      const currentFilter = categoryFilter.value;
+      categoryFilter.innerHTML = '<option value="">Tüm kategoriler</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat.id;
+        opt.textContent = cat.name;
+        if (cat.id === currentFilter) opt.selected = true;
+        categoryFilter.appendChild(opt);
+      });
+
+      // Product form category select
+      const prodCatSel = document.getElementById("prodCategory");
+      const currentVal = prodCatSel.value;
+      prodCatSel.innerHTML = "";
+      categories.forEach(cat => {
+        const opt = document.createElement("option");
+        opt.value = cat.id;
+        opt.textContent = cat.name;
+        if (cat.id === currentVal) opt.selected = true;
+        prodCatSel.appendChild(opt);
+      });
+    }
+
+    categoryFilter.addEventListener("change", renderProductList);
+
+    // ── Tab switching ──────────────────────
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab" + capitalize(btn.dataset.tab)).classList.add("active");
+      });
+    });
+
+    function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+    // ── Form modal open ─────────────────────
+    function openCatForm(cat) {
+      formMode  = "cat";
+      editingId = cat ? cat.id : null;
+      formTitle.textContent = cat ? "Kategoriyi Düzenle" : "Yeni Kategori";
+      fieldsCat.classList.remove("hidden");
+      fieldsProd.classList.add("hidden");
+      document.getElementById("catName").value  = cat ? cat.name  : "";
+      document.getElementById("catOrder").value = cat ? cat.order : "";
+      pendingImageBlob = null;
+      pendingImageName = "";
+      document.getElementById("catImageInput").value = "";
+      document.getElementById("catPreviewWrap").classList.remove("visible");
+      formError.textContent = "";
+      formModal.classList.remove("hidden");
+    }
+
+    function openProdForm(prod) {
+      formMode  = "prod";
+      editingId = prod ? prod.id : null;
+      formTitle.textContent = prod ? "Ürünü Düzenle" : "Yeni Ürün";
+      fieldsCat.classList.add("hidden");
+      fieldsProd.classList.remove("hidden");
+      populateCategorySelects();
+      document.getElementById("prodName").value     = prod ? prod.name        : "";
+      document.getElementById("prodDesc").value     = prod ? prod.description : "";
+      document.getElementById("prodPrice").value    = prod ? (prod.price || "").replace(/[^\d]/g, "") : "";
+      document.getElementById("prodOrder").value    = prod ? prod.order       : "";
+      if (prod) document.getElementById("prodCategory").value = prod.categoryId;
+      pendingImageBlob = null;
+      pendingImageName = "";
+      document.getElementById("prodImageInput").value = "";
+      document.getElementById("prodPreviewWrap").classList.remove("visible");
+      formError.textContent = "";
+      formModal.classList.remove("hidden");
+    }
+
+    function closeForm() { formModal.classList.add("hidden"); }
+
+    document.getElementById("addCategoryBtn").addEventListener("click", () => openCatForm(null));
+    document.getElementById("addProductBtn").addEventListener("click",  () => openProdForm(null));
+    formModalClose.addEventListener("click", closeForm);
+    formCancelBtn.addEventListener("click",  closeForm);
+    formModal.addEventListener("click", (e) => { if (e.target === formModal) closeForm(); });
+
+    // ── Image compression + upload ──────────
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = () => {
+            const MAX = 1080;
+            let w = img.width, h = img.height;
+            if (w > MAX || h > MAX) {
+              const scale = MAX / Math.max(w, h);
+              w = Math.round(w * scale);
+              h = Math.round(h * scale);
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width  = w;
+            canvas.height = h;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, w, h);
+            canvas.toBlob(
+              (blob) => blob ? resolve(blob) : reject(new Error("Canvas toBlob başarısız")),
+              "image/webp",
+              0.8
+            );
+          };
+          img.onerror = reject;
+          img.src = ev.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadToCloudinary(blob, filename) {
+      const formData = new FormData();
+      formData.append("file",           blob);
+      formData.append("upload_preset",  CLOUDINARY_PRESET);
+      formData.append("folder",         "oylum");
+      formData.append("public_id",      filename.replace(/\.[^.]+$/, ""));
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`,
+        { method: "POST", body: formData }
+      );
+      if (!res.ok) throw new Error("Cloudinary yükleme hatası: " + res.status);
+      const data = await res.json();
+      return data.secure_url;
+    }
+
+    function setupImageInput(inputId, previewWrapId, previewImgId, previewInfoId) {
+      document.getElementById(inputId).addEventListener("change", async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          const blob = await compressImage(file);
+          pendingImageBlob = blob;
+          pendingImageName = file.name.replace(/\.[^.]+$/, "") + "_" + Date.now() + ".webp";
+          const url = URL.createObjectURL(blob);
+          document.getElementById(previewImgId).src = url;
+          document.getElementById(previewInfoId).textContent =
+            `Optimize edildi: ${(blob.size / 1024).toFixed(0)} KB  ·  WebP`;
+          document.getElementById(previewWrapId).classList.add("visible");
+        } catch (err) {
+          showToast("Resim işlenemedi: " + err.message);
+        }
+      });
+    }
+
+    setupImageInput("catImageInput",  "catPreviewWrap",  "catPreviewImg",  "catPreviewInfo");
+    setupImageInput("prodImageInput", "prodPreviewWrap", "prodPreviewImg", "prodPreviewInfo");
+
+    // ── Save ───────────────────────────────
+    formSaveBtn.addEventListener("click", async () => {
+      formError.textContent = "";
+      formSaveBtn.disabled  = true;
+      formSaveBtn.innerHTML = '<span class="spinner-sm"></span>Kaydediliyor…';
+      try {
+        if (formMode === "cat") await saveCat();
+        else                    await saveProd();
+        closeForm();
+        await loadAll();
+        showToast("Kaydedildi ✓");
+      } catch (err) {
+        formError.textContent = "Hata: " + err.message;
+      } finally {
+        formSaveBtn.disabled  = false;
+        formSaveBtn.textContent = "Kaydet";
+      }
+    });
+
+    async function saveCat() {
+      const name  = document.getElementById("catName").value.trim();
+      const order = parseInt(document.getElementById("catOrder").value) || 1;
+      if (!name) throw new Error("Kategori adı boş bırakılamaz.");
+
+      let imageUrl = editingId
+        ? (categories.find(c => c.id === editingId) || {}).imageUrl || ""
+        : "";
+
+      if (pendingImageBlob) {
+        imageUrl = await uploadToCloudinary(pendingImageBlob, pendingImageName);
+      }
+
+      const data = { name, imageUrl, order };
+
+      if (editingId) {
+        await db.collection("categories").doc(editingId).update(data);
+      } else {
+        const slug = slugify(name);
+        await db.collection("categories").doc(slug).set(data);
+      }
+    }
+
+    async function saveProd() {
+      const name       = document.getElementById("prodName").value.trim();
+      const description= document.getElementById("prodDesc").value.trim();
+      const priceRaw   = document.getElementById("prodPrice").value.trim();
+      const price      = priceRaw ? priceRaw + " ₺" : "";
+      const categoryId = document.getElementById("prodCategory").value;
+      const order      = parseInt(document.getElementById("prodOrder").value) || 1;
+      if (!name)       throw new Error("Ürün adı boş bırakılamaz.");
+      if (!categoryId) throw new Error("Lütfen bir kategori seçin.");
+
+      let imageUrl = editingId
+        ? (products.find(p => p.id === editingId) || {}).imageUrl || ""
+        : "";
+
+      if (pendingImageBlob) {
+        imageUrl = await uploadToCloudinary(pendingImageBlob, pendingImageName);
+      }
+
+      const data = { name, description, price, imageUrl, categoryId, order };
+
+      if (editingId) {
+        await db.collection("products").doc(editingId).update(data);
+      } else {
+        await db.collection("products").add(data);
+      }
+    }
+
+    // ── Delete ─────────────────────────────
+    async function deleteCategory(cat) {
+      const prodCount = products.filter(p => p.categoryId === cat.id).length;
+      const msg = prodCount > 0
+        ? `"${cat.name}" kategorisini silmek istiyor musun? Bu kategoriye ait ${prodCount} ürün de silinecek!`
+        : `"${cat.name}" kategorisini silmek istiyor musun?`;
+      if (!confirm(msg)) return;
+      try {
+        const batch = db.batch();
+        batch.delete(db.collection("categories").doc(cat.id));
+        products.filter(p => p.categoryId === cat.id).forEach(p => {
+          batch.delete(db.collection("products").doc(p.id));
+        });
+        await batch.commit();
+        await loadAll();
+        showToast("Silindi ✓");
+      } catch (err) {
+        showToast("Silinemedi: " + err.message);
+      }
+    }
+
+    async function deleteProduct(prod) {
+      if (!confirm(`"${prod.name}" ürününü silmek istiyor musun?`)) return;
+      try {
+        await db.collection("products").doc(prod.id).delete();
+        await loadAll();
+        showToast("Silindi ✓");
+      } catch (err) {
+        showToast("Silinemedi: " + err.message);
+      }
+    }
+
+    // ── Helpers ────────────────────────────
+    function escHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function slugify(name) {
+      return name.toLowerCase()
+        .replace(/ş/g,"s").replace(/ç/g,"c").replace(/ğ/g,"g")
+        .replace(/ü/g,"u").replace(/ö/g,"o").replace(/ı/g,"i")
+        .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+    }
+  </script>
+</body>
+</html>
